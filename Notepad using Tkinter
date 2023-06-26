@@ -1,0 +1,123 @@
+from tkinter import *
+#for about menu
+from tkinter.messagebox import showinfo
+#opening file and saving file
+from tkinter.filedialog import askopenfilename, asksaveasfilename
+import os
+
+
+def newfile():
+    global file
+    root.title("*.txt - Notepad")
+    file=None
+    Textarea.delete(1.0, END)
+
+
+def openfile():
+    global file
+    file=askopenfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")])
+    if file=="":
+        file=None
+    else:
+        root.title(os.path.basename(file) +'-Notepad')
+        Textarea.delete(1.0, END)
+        f=open(file, 'r')
+        Textarea.insert(1.0, f.read())
+        f.close()
+
+
+def savefile():
+    global file
+    if file==None:
+        file=asksaveasfilename(initialfile='*.txt', defaultextension=".txt",
+                               filetypes=[("Text Documents", "*.txt")])
+        if file=='':
+            file=None
+        else:
+            f = open(file, 'w')
+            f.write(Textarea.get(1.0, END))
+            f.close()
+            root.title(os.path.basename(file) +'-Notepad')
+    else:
+        f = open(file, 'w')
+        f.write(Textarea.get(1.0, END))
+        f.close()
+
+
+def quit_app():
+    root.destroy()
+
+
+def cut():
+    Textarea.event_generate('<<Cut>>')
+
+
+def copy():
+    Textarea.event_generate('<<Copy>>')
+
+
+def paste():
+    Textarea.event_generate('<<Paste>>')
+
+
+def about_the_app():
+    showinfo("Notepad", "Notepad with Debasmita")
+
+
+root = Tk()
+root.title("Notepad")
+root.geometry('650x350')
+menubar = Menu(root)
+
+# filemenu starts
+filemenu = Menu(menubar, tearoff=0)
+
+# to open a new file
+filemenu.add_command(label='New', command=newfile)
+
+# to open an existing file
+filemenu.add_command(label='Open', command=openfile)
+
+# to save a file
+filemenu.add_command(label='Save', command=savefile)
+
+# separting Exit from the other commands
+filemenu.add_separator()
+
+# to exit application
+filemenu.add_command(label='Exit', command=quit_app)
+
+# to add the file menu on the menubar
+menubar.add_cascade(label='File', menu=filemenu)
+
+# edit menu starts
+editmenu = Menu(menubar, tearoff=0)
+editmenu.add_separator()
+
+# to cut copy and paste a text
+editmenu.add_command(label='Cut.........Ctrl+X', command=cut)
+editmenu.add_command(label='Copy......Ctrl+C', command=copy)
+editmenu.add_command(label='Paste......Ctrl+V', command=paste)
+
+# to add the edit menu on the menubar
+menubar.add_cascade(label='Edit', menu=editmenu)
+
+# help menu starts
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label='About', command=about_the_app)
+
+# to add the help menu on the menubar
+menubar.add_cascade(label='help', menu=helpmenu)
+
+Textarea = Text(root, font='Lucida 13')
+file = None
+Textarea.pack(expand=True, fill=BOTH)
+
+#adding scrollbar
+Scroll=Scrollbar(Textarea)
+Scroll.pack(side=RIGHT, fill=Y)
+Scroll.config(command=Textarea.yview)
+Textarea.config(yscrollcommand=Scroll.set)
+
+root.config(menu=menubar)
+root.mainloop()
